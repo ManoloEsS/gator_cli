@@ -1,35 +1,20 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
+	"log"
 	"os"
 
 	"github.com/ManoloEsS/gator_cli/cli"
 	"github.com/ManoloEsS/gator_cli/internal/config"
+	"github.com/ManoloEsS/gator_cli/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	//read config file
-	cfg, err := config.Read()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	//initialize State and Commands from cli
-	programState := cli.State{}
-	cmds := cli.Commands{
-		CommandMap: make(map[string]func(*cli.State, cli.Command) error),
-	}
-
-	//save read config to current state
-	programState.Cfg = &cfg
-	//register login command in commands
-	cmds.Register("login", cli.HandlerLogin)
-
+	//parse command line arguments
 	if len(os.Args) < 2 {
-		fmt.Println("argument needed, usage: gator <argument>")
-		os.Exit(1)
+		log.Fatal("argument needed, usage: gator <argument>")
 	}
 	name, args := os.Args[1], os.Args[2:]
 
@@ -38,9 +23,45 @@ func main() {
 		Arguments: args,
 	}
 
-	err = cmds.Run(&programState, cmd)
+	//read config file
+	cfg, err := config.Read()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatal(err)
+	}
+
+	//open database using url in config
+	db, err := sql.Open("postgres", cfg.DbUrl)
+	if err != nil {
+		log.Fatalf("database could not be opened: %v", err)
+	}
+	defer db.Close()
+
+	//ping database to check if it's reachable
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("database could not be reached: %v", err)
+	}
+
+	//initialize State and Commands from cli
+	//add database and its queries to program stat
+	dbQueries := database.New(db)
+
+	programState := &cli.State{
+		Db:  dbQueries,
+		Cfg: &cfg,
+	}
+
+	cmds := cli.Commands{
+		CommandMap: make(map[string]func(*cli.State, cli.Command) error),
+	}
+
+	//register login command in commands
+	cmds.Register("login", cli.HandlerLogin)
+	cmds.Register("register", cli.HandlerRegister)
+
+	//run command
+	err = cmds.Run(programState, cmd)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
