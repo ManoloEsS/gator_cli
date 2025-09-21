@@ -9,6 +9,17 @@ import (
 
 const configFileName = ".gatorconfig.json"
 
+// getConfigFilePath is a variable to allow overriding in tests
+var getConfigFilePath = func() (string, error) {
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	configPath := filepath.Join(homePath, configFileName)
+	return configPath, nil
+}
+
 type Config struct {
 	DbUrl           string `json:"db_url"`
 	CurrentUserName string `json:"current_user_name"`
@@ -59,14 +70,4 @@ func write(cfg Config) error {
 	}
 
 	return nil
-}
-
-func getConfigFilePath() (string, error) {
-	homePath, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	configPath := filepath.Join(homePath, configFileName)
-	return configPath, nil
 }
