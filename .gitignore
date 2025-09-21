@@ -1,4 +1,9 @@
 CRUSH.md
 .crush
 
+# Test coverage reports
+coverage.out
+coverage.html
 
+# Test artifacts
+*.test
