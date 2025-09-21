@@ -58,6 +58,7 @@ func main() {
 	//register login command in commands
 	cmds.Register("login", cli.HandlerLogin)
 	cmds.Register("register", cli.HandlerRegister)
+	cmds.Register("reset", cli.HandlerReset)
 
 	//run command
 	err = cmds.Run(programState, cmd)

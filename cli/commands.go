@@ -1,6 +1,8 @@
 package cli
 
-import "errors"
+import (
+	"errors"
+)
 
 type Command struct {
 	Name      string
