@@ -47,10 +47,7 @@ func main() {
 	//add database and its queries to program stat
 	dbQueries := database.New(db)
 
-	programState := &cli.State{
-		Db:  dbQueries,
-		Cfg: &cfg,
-	}
+	programState := cli.NewState(dbQueries, &cfg)
 
 	cmds := cli.Commands{
 		CommandMap: make(map[string]func(*cli.State, cli.Command) error),
