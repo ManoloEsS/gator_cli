@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// Handler function that resets the users table from the database
 func HandlerReset(s *State, cmd Command) error {
 	err := s.Db.ResetUsers(context.Background())
 	if err != nil {
