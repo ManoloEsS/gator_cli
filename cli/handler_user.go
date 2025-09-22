@@ -9,6 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// Handler that checks if a user is registered in the db
+// and sets such user to the config file for acess
 func HandlerLogin(s *State, cmd Command) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
@@ -28,6 +30,9 @@ func HandlerLogin(s *State, cmd Command) error {
 	return nil
 }
 
+// Handler that checks if a user is already registered in the database,
+// registers the user if it is not registered, and sets it
+// as the current user in the config file
 func HandlerRegister(s *State, cmd Command) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("usage: %s <name>\n", cmd.Name)

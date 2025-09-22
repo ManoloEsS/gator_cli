@@ -15,7 +15,8 @@ import (
 func main() {
 	//parse command line arguments
 	if len(os.Args) < 2 {
-		log.Fatal("argument needed, usage: gator <argument>")
+		log.Fatal("argument needed, usage: gator <argument>\n")
+
 	}
 	name, args := os.Args[1], os.Args[2:]
 
@@ -44,7 +45,7 @@ func main() {
 	}
 
 	//initialize State and Commands from cli
-	//add database and its queries to program stat
+	//add database and its function=>queries to program state
 	dbQueries := database.New(db)
 
 	programState := cli.NewState(dbQueries, &cfg)
@@ -53,12 +54,12 @@ func main() {
 		CommandMap: make(map[string]func(*cli.State, cli.Command) error),
 	}
 
-	//register login command in commands
+	//register each command in commands
 	cmds.Register("login", cli.HandlerLogin)
 	cmds.Register("register", cli.HandlerRegister)
 	cmds.Register("reset", cli.HandlerReset)
 
-	//run command
+	//run command from parsed command line arguments
 	err = cmds.Run(programState, cmd)
 	if err != nil {
 		fmt.Fprint(os.Stderr, err)

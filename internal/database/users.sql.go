@@ -30,6 +30,7 @@ type CreateUserParams struct {
 	Name      string
 }
 
+// function that takes a CreateUserParams struct and adds it to the table in the database
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, createUser,
 		arg.ID,
@@ -53,6 +54,7 @@ FROM users
 WHERE name = $1
 `
 
+// function that gets a user from the name
 func (q *Queries) GetUser(ctx context.Context, name string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, name)
 	var i User
@@ -69,6 +71,7 @@ const resetUsers = `-- name: ResetUsers :exec
 DELETE FROM users
 `
 
+// function that resetts users table
 func (q *Queries) ResetUsers(ctx context.Context) error {
 	_, err := q.db.ExecContext(ctx, resetUsers)
 	return err

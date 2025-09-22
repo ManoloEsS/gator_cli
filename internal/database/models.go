@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// user struct that is used to create a new user in the database
 type User struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
