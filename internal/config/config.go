@@ -32,6 +32,10 @@ func (cfg *Config) SetUser(name string) error {
 	return write(*cfg)
 }
 
+func (cfg *Config) GetCurrentUser() string {
+	return cfg.CurrentUserName
+}
+
 // Function that reads the config file and extracts the json data as a Config struct
 func Read() (Config, error) {
 	fullPath, err := getConfigFilePath()

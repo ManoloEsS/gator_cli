@@ -59,3 +59,26 @@ func HandlerRegister(s *State, cmd Command) error {
 
 	return nil
 }
+
+// Handler function that uses the GetCurrentUser method of the config interface
+// to print the current user and all other registered users
+func HandlerListUsers(s *State, cmd Command) error {
+	users, err := s.Db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't retrieve list of users: %v\n", err)
+	}
+
+	for _, user := range users {
+		if user.Name == s.Cfg.GetCurrentUser() {
+			fmt.Printf("%s (current)\n", user.Name)
+		} else {
+			fmt.Printf("%s\n", user.Name)
+		}
+	}
+	return nil
+}
+
+func PrintUser(user database.User) {
+	fmt.Printf(" * ID:      %v\n", user.ID)
+	fmt.Printf(" * Name:    %v\n", user.Name)
+}
