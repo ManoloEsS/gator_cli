@@ -9,7 +9,6 @@ import (
 	"database/sql"
 )
 
-// sqlc interface
 type DBTX interface {
 	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
 	PrepareContext(context.Context, string) (*sql.Stmt, error)
@@ -17,7 +16,6 @@ type DBTX interface {
 	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 }
 
-// function that returns the Queries struct that holds the database data
 func New(db DBTX) *Queries {
 	return &Queries{db: db}
 }

@@ -58,6 +58,7 @@ func main() {
 	cmds.Register("login", cli.HandlerLogin)
 	cmds.Register("register", cli.HandlerRegister)
 	cmds.Register("reset", cli.HandlerReset)
+	cmds.Register("users", cli.HandlerListUsers)
 
 	//run command from parsed command line arguments
 	err = cmds.Run(programState, cmd)

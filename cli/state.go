@@ -16,11 +16,13 @@ type DBInterface interface {
 	GetUser(ctx context.Context, name string) (database.User, error)
 	CreateUser(ctx context.Context, params database.CreateUserParams) (database.User, error)
 	ResetUsers(ctx context.Context) error
+	GetUsers(ctx context.Context) ([]database.User, error)
 }
 
 // ConfigInterface defines the config operations needed by Config Interface
 type ConfigInterface interface {
 	SetUser(name string) error
+	GetCurrentUser() string
 }
 
 // State struct that stores the Database and Config interfaces
