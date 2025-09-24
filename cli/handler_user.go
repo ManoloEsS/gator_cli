@@ -9,6 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// Handler that checks if a user is registered in the db
+// and sets such user to the config file for acess
 func HandlerLogin(s *State, cmd Command) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
@@ -28,6 +30,9 @@ func HandlerLogin(s *State, cmd Command) error {
 	return nil
 }
 
+// Handler that checks if a user is already registered in the database,
+// registers the user if it is not registered, and sets it
+// as the current user in the config file
 func HandlerRegister(s *State, cmd Command) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("usage: %s <name>\n", cmd.Name)
@@ -53,4 +58,27 @@ func HandlerRegister(s *State, cmd Command) error {
 	fmt.Println("User successfully created!")
 
 	return nil
+}
+
+// Handler function that uses the GetCurrentUser method of the config interface
+// to print the current user and all other registered users
+func HandlerListUsers(s *State, cmd Command) error {
+	users, err := s.Db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't retrieve list of users: %v\n", err)
+	}
+
+	for _, user := range users {
+		if user.Name == s.Cfg.GetCurrentUser() {
+			fmt.Printf("%s (current)\n", user.Name)
+		} else {
+			fmt.Printf("%s\n", user.Name)
+		}
+	}
+	return nil
+}
+
+func PrintUser(user database.User) {
+	fmt.Printf(" * ID:      %v\n", user.ID)
+	fmt.Printf(" * Name:    %v\n", user.Name)
 }

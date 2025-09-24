@@ -25,11 +25,18 @@ type Config struct {
 	CurrentUserName string `json:"current_user_name"`
 }
 
+// Config method that sets the username passed as the current username in the state's config and
+// writes it to the config file
 func (cfg *Config) SetUser(name string) error {
 	cfg.CurrentUserName = name
 	return write(*cfg)
 }
 
+func (cfg *Config) GetCurrentUser() string {
+	return cfg.CurrentUserName
+}
+
+// Function that reads the config file and extracts the json data as a Config struct
 func Read() (Config, error) {
 	fullPath, err := getConfigFilePath()
 	if err != nil {
@@ -51,6 +58,7 @@ func Read() (Config, error) {
 	return newConfig, nil
 }
 
+// Function that encodes the config struct into json and writes it in the config file
 func write(cfg Config) error {
 	fullPath, err := getConfigFilePath()
 	if err != nil {

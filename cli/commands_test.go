@@ -6,73 +6,15 @@ import (
 	"testing"
 
 	"github.com/ManoloEsS/gator_cli/internal/database"
+	"github.com/ManoloEsS/gator_cli/test"
 )
-
-// Mock implementations for testing
-type MockDb struct {
-	users       map[string]database.User
-	createError error
-	resetError  error
-}
-
-func NewMockDb() *MockDb {
-	return &MockDb{
-		users: make(map[string]database.User),
-	}
-}
-
-func (m *MockDb) GetUser(ctx context.Context, name string) (database.User, error) {
-	user, exists := m.users[name]
-	if !exists {
-		return database.User{}, errors.New("sql: no rows in result set")
-	}
-	return user, nil
-}
-
-func (m *MockDb) CreateUser(ctx context.Context, params database.CreateUserParams) (database.User, error) {
-	if m.createError != nil {
-		return database.User{}, m.createError
-	}
-	if _, exists := m.users[params.Name]; exists {
-		return database.User{}, errors.New("user already exists")
-	}
-	user := database.User{
-		ID:        params.ID,
-		CreatedAt: params.CreatedAt,
-		UpdatedAt: params.UpdatedAt,
-		Name:      params.Name,
-	}
-	m.users[params.Name] = user
-	return user, nil
-}
-
-func (m *MockDb) ResetUsers(ctx context.Context) error {
-	if m.resetError != nil {
-		return m.resetError
-	}
-	m.users = make(map[string]database.User)
-	return nil
-}
-
-type MockCfg struct {
-	currentUser string
-	setUserErr  error
-}
-
-func (m *MockCfg) SetUser(name string) error {
-	if m.setUserErr != nil {
-		return m.setUserErr
-	}
-	m.currentUser = name
-	return nil
-}
 
 func TestCommands_Register(t *testing.T) {
 	tests := []struct {
-		name         string
-		commandName  string
-		handlerFunc  func(*State, Command) error
-		expectPanic  bool
+		name        string
+		commandName string
+		handlerFunc func(*State, Command) error
+		expectPanic bool
 	}{
 		{
 			name:        "register valid command",
@@ -166,7 +108,7 @@ func TestCommands_Run(t *testing.T) {
 			setupCmds: func(cmds *Commands) {
 				cmds.Register("args-cmd", func(s *State, cmd Command) error {
 					if len(cmd.Arguments) != 2 {
-						return errors.New("expected 2 arguments")
+
 					}
 					return nil
 				})
@@ -186,8 +128,8 @@ func TestCommands_Run(t *testing.T) {
 			}
 			tt.setupCmds(&commands)
 
-			mockDb := NewMockDb()
-			mockCfg := &MockCfg{}
+			mockDb := test.NewMockDb()
+			mockCfg := &test.MockCfg{}
 			state := &State{
 				Db:  mockDb,
 				Cfg: mockCfg,
@@ -211,9 +153,9 @@ func TestCommands_Run(t *testing.T) {
 }
 
 func TestHandlerRegister_CreateUserError(t *testing.T) {
-	mockDb := NewMockDb()
-	mockDb.createError = errors.New("database create error")
-	mockCfg := &MockCfg{}
+	mockDb := test.NewMockDb()
+	mockDb.CreateError = errors.New("database create error")
+	mockCfg := &test.MockCfg{}
 
 	state := &State{
 		Db:  mockDb,
@@ -267,26 +209,26 @@ func TestCommandStruct(t *testing.T) {
 func TestMockDbEdgeCases(t *testing.T) {
 	tests := []struct {
 		name        string
-		setupDb     func(*MockDb)
-		operation   func(*MockDb) error
+		setupDb     func(*test.MockDb)
+		operation   func(*test.MockDb) error
 		expectError bool
 	}{
 		{
 			name: "reset users with error",
-			setupDb: func(db *MockDb) {
-				db.resetError = errors.New("reset failed")
+			setupDb: func(db *test.MockDb) {
+				db.ResetError = errors.New("reset failed")
 			},
-			operation: func(db *MockDb) error {
+			operation: func(db *test.MockDb) error {
 				return db.ResetUsers(context.Background())
 			},
 			expectError: true,
 		},
 		{
 			name: "get user from empty database",
-			setupDb: func(db *MockDb) {
+			setupDb: func(db *test.MockDb) {
 				// No setup needed
 			},
-			operation: func(db *MockDb) error {
+			operation: func(db *test.MockDb) error {
 				_, err := db.GetUser(context.Background(), "nonexistent")
 				return err
 			},
@@ -296,7 +238,7 @@ func TestMockDbEdgeCases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockDb := NewMockDb()
+			mockDb := test.NewMockDb()
 			tt.setupDb(mockDb)
 
 			err := tt.operation(mockDb)
@@ -317,7 +259,7 @@ func TestIntegrationCommandsWithHandlers(t *testing.T) {
 		commandName string
 		handler     func(*State, Command) error
 		cmd         Command
-		setupState  func(*MockDb, *MockCfg)
+		setupState  func(*test.MockDb, *test.MockCfg)
 		expectError bool
 	}{
 		{
@@ -328,9 +270,9 @@ func TestIntegrationCommandsWithHandlers(t *testing.T) {
 				Name:      "login",
 				Arguments: []string{"testuser"},
 			},
-			setupState: func(db *MockDb, cfg *MockCfg) {
+			setupState: func(db *test.MockDb, cfg *test.MockCfg) {
 				// Add a user to login
-				db.users["testuser"] = database.User{Name: "testuser"}
+				db.Users["testuser"] = database.User{Name: "testuser"}
 			},
 			expectError: false,
 		},
@@ -342,7 +284,7 @@ func TestIntegrationCommandsWithHandlers(t *testing.T) {
 				Name:      "register",
 				Arguments: []string{"newuser"},
 			},
-			setupState:  func(db *MockDb, cfg *MockCfg) {},
+			setupState:  func(db *test.MockDb, cfg *test.MockCfg) {},
 			expectError: false,
 		},
 		{
@@ -353,10 +295,10 @@ func TestIntegrationCommandsWithHandlers(t *testing.T) {
 				Name:      "reset",
 				Arguments: []string{},
 			},
-			setupState: func(db *MockDb, cfg *MockCfg) {
+			setupState: func(db *test.MockDb, cfg *test.MockCfg) {
 				// Add some users to reset
-				db.users["user1"] = database.User{Name: "user1"}
-				db.users["user2"] = database.User{Name: "user2"}
+				db.Users["user1"] = database.User{Name: "user1"}
+				db.Users["user2"] = database.User{Name: "user2"}
 			},
 			expectError: false,
 		},
@@ -371,8 +313,8 @@ func TestIntegrationCommandsWithHandlers(t *testing.T) {
 			commands.Register(tt.commandName, tt.handler)
 
 			// Setup state
-			mockDb := NewMockDb()
-			mockCfg := &MockCfg{}
+			mockDb := test.NewMockDb()
+			mockCfg := &test.MockCfg{}
 			tt.setupState(mockDb, mockCfg)
 
 			state := &State{
@@ -394,11 +336,11 @@ func TestIntegrationCommandsWithHandlers(t *testing.T) {
 
 func TestNewState(t *testing.T) {
 	// This test ensures NewState creates a state with the correct interfaces
-	mockDb := NewMockDb()
-	mockCfg := &MockCfg{}
+	mockDb := test.NewMockDb()
+	mockCfg := &test.MockCfg{}
 
 	// Create a state using concrete types (simulating production use)
-	// Note: We can't test with real *database.Queries and *config.Config 
+	// Note: We can't test with real *database.Queries and *config.Config
 	// without setting up a real database, so we test the interface compliance
 	state := &State{
 		Db:  mockDb,
@@ -427,7 +369,7 @@ func TestNewState(t *testing.T) {
 
 // Helper function to check if a string contains a substring
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || 
+	return len(s) >= len(substr) && (s == substr || len(substr) == 0 ||
 		(len(s) > len(substr) && findSubstring(s, substr)))
 }
 
