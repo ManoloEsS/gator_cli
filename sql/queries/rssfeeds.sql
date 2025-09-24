@@ -9,3 +9,13 @@ VALUES (
     $6
 )
 RETURNING *;
+
+-- name: GetFeeds :many
+SELECT users.name AS user_name, 
+    JSON_AGG(JSON_BUILD_OBJECT('name', rssfeeds.name, 'url', rssfeeds.url)) AS feed_details 
+FROM users 
+INNER JOIN rssfeeds 
+ON users.id = rssfeeds.user_id 
+GROUP BY users.name 
+ORDER BY users.name;
+
