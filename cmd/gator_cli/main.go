@@ -61,6 +61,7 @@ func main() {
 	cmds.Register("users", cli.HandlerListUsers)
 	cmds.Register("agg", cli.HandlerAgg)
 	cmds.Register("addfeed", cli.HandlerAddFeed)
+	cmds.Register("feeds", cli.HandlerListFeeds)
 
 	//run command from parsed command line arguments
 	err = cmds.Run(programState, cmd)

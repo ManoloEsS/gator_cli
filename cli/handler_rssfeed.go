@@ -1,0 +1,78 @@
+package cli
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/ManoloEsS/gator_cli/internal/database"
+	"github.com/ManoloEsS/gator_cli/internal/rss"
+	"github.com/google/uuid"
+)
+
+func HandlerAddFeed(s *State, cmd Command) error {
+	if len(cmd.Arguments) < 2 {
+		return fmt.Errorf("usage: %s <name> <url>\n", cmd.Name)
+	}
+
+	feedName := cmd.Arguments[0]
+	feedUrl := cmd.Arguments[1]
+	currentUser := s.Cfg.GetCurrentUser()
+	currentUserID, err := s.Db.GetUser(context.Background(), currentUser)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.Db.CreateRSSFeed(context.Background(), database.CreateRSSFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name:      feedName,
+		Url:       feedUrl,
+		UserID:    currentUserID.ID,
+	})
+
+	fmt.Printf("\"%s\" succesfully added to %s's feed\n", feedName, currentUser)
+
+	return nil
+}
+
+func HandlerAgg(s *State, cmd Command) error {
+	feed, err := rss.FetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return fmt.Errorf("couldn't fetch feed: %w", err)
+	}
+	fmt.Printf("Feed: %+v\n", feed)
+	return nil
+}
+
+func HandlerListFeeds(s *State, cmd Command) error {
+	type feeds struct {
+		Name string `json:"name"`
+		Url  string `json:"url"`
+	}
+
+	feedsData, err := s.Db.GetFeeds(context.Background())
+	if err != nil {
+		return fmt.Errorf("Couldn't retrieve feeds data from database: %w", err)
+	}
+	for _, item := range feedsData {
+		var decodedData []feeds
+		fmt.Println("=============USER=============")
+		fmt.Printf(">%s\n", item.UserName)
+		fmt.Println("-------------FEEDS-------------")
+
+		err := json.Unmarshal(item.FeedDetails, &decodedData)
+		if err != nil {
+			fmt.Printf("Failed to decode feed details for user %s: %v\n", item.UserName, err)
+			continue
+		}
+
+		for _, feed := range decodedData {
+			fmt.Printf(">%-20s url:%s\n", feed.Name, feed.Url)
+		}
+		fmt.Println()
+	}
+	return nil
+}

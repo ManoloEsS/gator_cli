@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -53,4 +54,42 @@ func (q *Queries) CreateRSSFeed(ctx context.Context, arg CreateRSSFeedParams) (R
 		&i.UserID,
 	)
 	return i, err
+}
+
+const getFeeds = `-- name: GetFeeds :many
+SELECT users.name AS user_name, 
+    JSON_AGG(JSON_BUILD_OBJECT('name', rssfeeds.name, 'url', rssfeeds.url)) AS feed_details 
+FROM users 
+INNER JOIN rssfeeds 
+ON users.id = rssfeeds.user_id 
+GROUP BY users.name 
+ORDER BY users.name
+`
+
+type GetFeedsRow struct {
+	UserName    string
+	FeedDetails json.RawMessage
+}
+
+func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFeeds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFeedsRow
+	for rows.Next() {
+		var i GetFeedsRow
+		if err := rows.Scan(&i.UserName, &i.FeedDetails); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -67,3 +67,8 @@ func (m *MockDb) ResetUsers(ctx context.Context) error {
 func (m *MockDb) CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.Rssfeed, error) {
 	return database.Rssfeed{}, nil
 }
+
+// TODO:finish test function
+func (m *MockDb) GetFeeds(ctx context.Context) ([]database.GetFeedsRow, error) {
+	return []database.GetFeedsRow{}, nil
+}
