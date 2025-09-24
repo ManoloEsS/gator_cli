@@ -2,7 +2,7 @@ CRUSH.md
 .crush
 *gemini*
 *explanation*
-*detailed_go_testing*
+detailed_go_testing.md
 
 # Test coverage reports
 coverage.out
@@ -10,3 +10,6 @@ coverage.html
 
 # Test artifacts
 *.test
+
+# Test templates
+templates/
