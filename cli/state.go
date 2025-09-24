@@ -17,6 +17,7 @@ type DBInterface interface {
 	CreateUser(ctx context.Context, params database.CreateUserParams) (database.User, error)
 	ResetUsers(ctx context.Context) error
 	GetUsers(ctx context.Context) ([]database.User, error)
+	CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.Rssfeed, error)
 }
 
 // ConfigInterface defines the config operations needed by Config Interface
