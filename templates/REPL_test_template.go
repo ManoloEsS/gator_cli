@@ -1,6 +1,8 @@
+
+//go:build ignore
 // +build ignore
 
-package repl_template
+package templates
 
 // TEMPLATE: REPL Handler Test Template
 //
@@ -102,12 +104,14 @@ func (m *MockCfg) GetCurrentUser() string {
 func TestHandlerLogin(t *testing.T) {
 	// TODO: Define test cases for login scenarios
 	tests := []struct {
+
 		name        string              // Test case description
 		cmd         cli.Command         // Command to execute
 		setupDB     func(*MockDb)       // Function to setup database state
 		setupCfg    func(*MockCfg)      // Function to setup config state  
 		expectError bool                // Whether handler should return error
 		errorMsg    string              // Expected error message (if any)
+
 		// TODO: Add fields for verifying successful login state
 	}{
 		{
@@ -117,7 +121,9 @@ func TestHandlerLogin(t *testing.T) {
 				Name:      "login",
 				Arguments: []string{}, // Empty arguments should cause error
 			},
+      test_templates
 			setupDB:     func(db *MockDb) {}, // No database setup needed
+
 			setupCfg:    func(cfg *MockCfg) {}, // No config setup needed
 			expectError: true,
 			errorMsg:    "TODO: add expected error message", // Should be "usage: login <name>"
@@ -132,6 +138,7 @@ func TestHandlerLogin(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// TODO: Create mock database and config
+
 			
 			// TODO: Setup test state using setup functions
 			
@@ -142,6 +149,8 @@ func TestHandlerLogin(t *testing.T) {
 			// TODO: Verify error expectations
 			// PATTERN: if tt.expectError check err != nil and error message matches
 			
+
+
 			// TODO: Verify successful login effects (user is set in config)
 		})
 	}
@@ -153,12 +162,14 @@ func TestHandlerLogin(t *testing.T) {
 func TestHandlerRegister(t *testing.T) {
 	// TODO: Define test cases for registration scenarios
 	tests := []struct {
+
 		name        string              // Test case description
 		cmd         cli.Command         // Command to execute
 		setupDB     func(*MockDb)       // Database setup function
 		setupCfg    func(*MockCfg)      // Config setup function
 		expectError bool                // Whether handler should error
 		errorMsg    string              // Expected error message
+
 		// TODO: Add fields for verifying user creation
 	}{
 		{
@@ -177,7 +188,9 @@ func TestHandlerRegister(t *testing.T) {
 			// TODO: Add test case for registering existing user
 			name: "TODO: add test case name",
 			cmd: cli.Command{
+
 				Name:      "register", 
+
 				Arguments: []string{"existing-user"},
 			},
 			setupDB: func(db *MockDb) {
@@ -202,6 +215,7 @@ func TestHandlerRegister(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// TODO: Create mocks and setup test state
+
 			
 			// TODO: Call cli.HandlerRegister
 			
@@ -210,19 +224,25 @@ func TestHandlerRegister(t *testing.T) {
 			// TODO: For successful cases, verify user was created in database
 			// PATTERN: Check that mockDb.users contains the new user
 			
+
 			// TODO: Verify user was set as current user in config
 		})
 	}
 }
 
+
 // TestHandlerReset tests the reset handler function  
+
+
 // PURPOSE: Verify database reset functionality clears all users
 // COVERS: Resetting empty database, resetting database with users, error handling
 func TestHandlerReset(t *testing.T) {
 	// TODO: Define test cases for reset scenarios
 	tests := []struct {
+
 		name    string           // Test case description
 		setupDB func(*MockDb)    // Database setup function
+
 		// TODO: Add expectError bool if reset can fail
 	}{
 		{
@@ -232,7 +252,9 @@ func TestHandlerReset(t *testing.T) {
 		},
 		{
 			// TODO: Add test case for resetting database with users
+
 			name: "TODO: add test case name", 
+
 			setupDB: func(db *MockDb) {
 				// TODO: Add multiple users to database
 				db.users["user1"] = database.User{
@@ -250,21 +272,24 @@ func TestHandlerReset(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// TODO: Create mock database and config
+
 			
 			// TODO: Setup database state
 			
 			// TODO: Create cli.State
 			
+
 			// TODO: Create reset command
 			cmd := cli.Command{
 				Name:      "reset",
 				Arguments: []string{},
-			}
+
 			
 			// TODO: Call cli.HandlerReset
 			
 			// TODO: Verify no error occurred (unless testing error case)
 			
+
 			// TODO: Verify all users were deleted
 			// PATTERN: Check that len(mockDb.users) == 0
 		})
@@ -276,7 +301,9 @@ func TestHandlerReset(t *testing.T) {
 // TestHandlerUsers - Test listing all users
 // TestHandlerAgg - Test RSS aggregation functionality
 // TestHandlerAddFeed - Test adding RSS feeds
+
 // TestHandlerFeeds - Test listing RSS feeds  
+
 // TestHandlerFollow - Test following RSS feeds
 // TestHandlerFollowing - Test listing followed feeds
 // TestHandlerUnfollow - Test unfollowing feeds
@@ -294,7 +321,9 @@ func TestHandlerUsers(t *testing.T) {
 	// TODO: Similar pattern to other handler tests
 	// Test cases might include:
 	// - List users from empty database
+
 	// - List users when database has multiple users  
+
 	// - Handle database error when getting users
 }
 
@@ -317,7 +346,9 @@ func TestHandlerAgg(t *testing.T) {
 //     return database.User{
 //         ID:        uuid.New(),
 //         CreatedAt: time.Now(),
+
 //         UpdatedAt: time.Now(), 
+
 //         Name:      name,
 //     }
 // }
@@ -343,4 +374,5 @@ func TestHandlerAgg(t *testing.T) {
 // Helper function to create command with arguments:
 // func createCommand(name string, args ...string) cli.Command {
 //     return cli.Command{Name: name, Arguments: args}
+
 // }
