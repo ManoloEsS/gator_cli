@@ -19,6 +19,7 @@ type DBInterface interface {
 	GetUsers(ctx context.Context) ([]database.User, error)
 	CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.Rssfeed, error)
 	GetFeeds(ctx context.Context) ([]database.GetFeedsRow, error)
+	GetFeedByUrl(ctx context.Context, url string) (database.Rssfeed, error)
 }
 
 // ConfigInterface defines the config operations needed by Config Interface

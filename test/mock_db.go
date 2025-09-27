@@ -72,3 +72,7 @@ func (m *MockDb) CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedPa
 func (m *MockDb) GetFeeds(ctx context.Context) ([]database.GetFeedsRow, error) {
 	return []database.GetFeedsRow{}, nil
 }
+
+func (m *MockDb) GetFeedByUrl(ctx context.Context, url string) (database.Rssfeed, error) {
+	return database.Rssfeed{}, nil
+}
