@@ -5,6 +5,7 @@ import (
 
 	"github.com/ManoloEsS/gator_cli/internal/config"
 	"github.com/ManoloEsS/gator_cli/internal/database"
+	"github.com/google/uuid"
 )
 
 //Db and Config interfaces are used to be able to test
@@ -20,6 +21,8 @@ type DBInterface interface {
 	CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.Rssfeed, error)
 	GetFeeds(ctx context.Context) ([]database.GetFeedsRow, error)
 	GetFeedByUrl(ctx context.Context, url string) (database.Rssfeed, error)
+	CreateFeedFollow(ctx context.Context, params database.CreateFeedFollowParams) (database.CreateFeedFollowRow, error)
+	GetFeedFollowsForUser(ctx context.Context, userID uuid.UUID) ([]database.GetFeedFollowsForUserRow, error)
 }
 
 // ConfigInterface defines the config operations needed by Config Interface
