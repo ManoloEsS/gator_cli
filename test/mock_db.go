@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/ManoloEsS/gator_cli/internal/database"
+	"github.com/google/uuid"
 )
 
 // Mock implementations for testing
@@ -75,4 +76,12 @@ func (m *MockDb) GetFeeds(ctx context.Context) ([]database.GetFeedsRow, error) {
 
 func (m *MockDb) GetFeedByUrl(ctx context.Context, url string) (database.Rssfeed, error) {
 	return database.Rssfeed{}, nil
+}
+
+func (m *MockDb) CreateFeedFollow(ctx context.Context, args database.CreateFeedFollowParams) (database.CreateFeedFollowRow, error) {
+	return database.CreateFeedFollowRow{}, nil
+}
+
+func (m *MockDb) GetFeedFollowsForUser(ctx context.Context, userID uuid.UUID) ([]database.GetFeedFollowsForUserRow, error) {
+	return []database.GetFeedFollowsForUserRow{}, nil
 }
