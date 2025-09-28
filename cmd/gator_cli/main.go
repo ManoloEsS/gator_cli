@@ -60,10 +60,10 @@ func main() {
 	cmds.Register("reset", cli.HandlerReset)
 	cmds.Register("users", cli.HandlerListUsers)
 	cmds.Register("agg", cli.HandlerAgg)
-	cmds.Register("addfeed", cli.HandlerAddFeed)
+	cmds.Register("addfeed", cli.MiddlewareLoggedIn(cli.HandlerAddFeed))
 	cmds.Register("feeds", cli.HandlerListFeeds)
-	cmds.Register("follow", cli.HandlerFeedFollow)
-	cmds.Register("following", cli.HandlerFeedFollowsForUser)
+	cmds.Register("follow", cli.MiddlewareLoggedIn(cli.HandlerFeedFollow))
+	cmds.Register("following", cli.MiddlewareLoggedIn(cli.HandlerFeedFollowsForUser))
 
 	//run command from parsed command line arguments
 	err = cmds.Run(programState, cmd)

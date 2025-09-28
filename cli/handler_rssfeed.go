@@ -11,18 +11,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func HandlerAddFeed(s *State, cmd Command) error {
+func HandlerAddFeed(s *State, cmd Command, user database.User) error {
 	if len(cmd.Arguments) < 2 {
 		return fmt.Errorf("usage: %s <name> <url>\n", cmd.Name)
 	}
 
 	feedName := cmd.Arguments[0]
 	feedUrl := cmd.Arguments[1]
-	currentUser := s.Cfg.GetCurrentUser()
-	currentUserData, err := s.Db.GetUser(context.Background(), currentUser)
-	if err != nil {
-		return err
-	}
 
 	feed, err := s.Db.CreateRSSFeed(context.Background(), database.CreateRSSFeedParams{
 		ID:        uuid.New(),
@@ -30,21 +25,21 @@ func HandlerAddFeed(s *State, cmd Command) error {
 		UpdatedAt: time.Now().UTC(),
 		Name:      feedName,
 		Url:       feedUrl,
-		UserID:    currentUserData.ID,
+		UserID:    user.ID,
 	})
 
 	_, err = s.Db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		UserID:    currentUserData.ID,
+		UserID:    user.ID,
 		FeedID:    feed.ID,
 	})
 	if err != nil {
 		return fmt.Errorf("Couldn't create feed follow from added feed: %w", err)
 	}
 
-	fmt.Printf("\"%s\" succesfully added to %s's feed\n", feed.Name, currentUser)
+	fmt.Printf("\"%s\" succesfully added to %s's feed\n", feed.Name, user.Name)
 
 	return nil
 }

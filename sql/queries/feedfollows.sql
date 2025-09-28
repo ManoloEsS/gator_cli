@@ -27,3 +27,5 @@ INNER JOIN rssfeeds ON feed_follows.feed_id = rssfeeds.id
 INNER JOIN users ON feed_follows.user_id = users.id
 WHERE feed_follows.user_id = $1;
 
+-- name: UnfollowFeed :exec
+
