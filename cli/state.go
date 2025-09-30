@@ -23,6 +23,7 @@ type DBInterface interface {
 	GetFeedByUrl(ctx context.Context, url string) (database.Rssfeed, error)
 	CreateFeedFollow(ctx context.Context, params database.CreateFeedFollowParams) (database.CreateFeedFollowRow, error)
 	GetFeedFollowsForUser(ctx context.Context, userID uuid.UUID) ([]database.GetFeedFollowsForUserRow, error)
+	UnfollowFeed(ctx context.Context, arg database.UnfollowFeedParams) error
 }
 
 // ConfigInterface defines the config operations needed by Config Interface

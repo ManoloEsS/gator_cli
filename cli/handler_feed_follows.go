@@ -11,7 +11,7 @@ import (
 
 func HandlerFeedFollow(s *State, cmd Command, user database.User) error {
 	if len(cmd.Arguments) < 1 {
-		return fmt.Errorf("usage: %s <name> <url>\n", cmd.Name)
+		return fmt.Errorf("usage: %s <url>\n", cmd.Name)
 	}
 
 	url := cmd.Arguments[0]
@@ -46,6 +46,7 @@ func HandlerFeedFollowsForUser(s *State, cmd Command, user database.User) error 
 	}
 	if len(feedFollows) == 0 {
 		fmt.Println("No feed follows found for this user.")
+		return nil
 	}
 
 	fmt.Println()
@@ -59,6 +60,24 @@ func HandlerFeedFollowsForUser(s *State, cmd Command, user database.User) error 
 }
 
 func HandlerUnfollowFeed(s *State, cmd Command, user database.User) error {
+	if len(cmd.Arguments) < 1 {
+		return fmt.Errorf("usage: %s <url>\n", cmd.Name)
+	}
+	url := cmd.Arguments[0]
+
+	feed, err := s.Db.GetFeedByUrl(context.Background(), url)
+	if err != nil {
+		return fmt.Errorf("Couldn't unfollow feed: %w", err)
+	}
+
+	err = s.Db.UnfollowFeed(context.Background(), database.UnfollowFeedParams{
+		UserID: user.ID,
+		FeedID: feed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("Couldn't unfollow feed: %w", err)
+	}
+	fmt.Printf("\"%s\" was removed from %s's feed", feed.Name, user.Name)
 
 	return nil
 }
