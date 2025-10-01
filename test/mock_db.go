@@ -65,8 +65,8 @@ func (m *MockDb) ResetUsers(ctx context.Context) error {
 }
 
 // TODO:finish function
-func (m *MockDb) CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.Rssfeed, error) {
-	return database.Rssfeed{}, nil
+func (m *MockDb) CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.CreateRSSFeedRow, error) {
+	return database.CreateRSSFeedRow{}, nil
 }
 
 // TODO:finish test function
@@ -88,4 +88,20 @@ func (m *MockDb) GetFeedFollowsForUser(ctx context.Context, userID uuid.UUID) ([
 
 func (m *MockDb) UnfollowFeed(ctx context.Context, arg database.UnfollowFeedParams) error {
 	return nil
+}
+
+func (m *MockDb) MarkFeedFetched(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+
+func (m *MockDb) GetNextFeedToFetch(ctx context.Context) (database.Rssfeed, error) {
+	return database.Rssfeed{}, nil
+}
+
+func (m *MockDb) CreatePost(ctx context.Context, arg database.CreatePostParams) (database.Post, error) {
+	return database.Post{}, nil
+}
+
+func (m *MockDb) GetPostsForUser(ctx context.Context, arg database.GetPostsForUserParams) ([]database.GetPostsForUserRow, error) {
+	return []database.GetPostsForUserRow{}, nil
 }
