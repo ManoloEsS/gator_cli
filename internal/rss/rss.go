@@ -12,7 +12,7 @@ import (
 
 func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	client := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: 3 * time.Second,
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)

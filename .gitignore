@@ -13,3 +13,5 @@ coverage.html
 
 # Test templates
 templates/
+
+.env
