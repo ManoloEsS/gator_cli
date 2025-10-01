@@ -18,12 +18,16 @@ type DBInterface interface {
 	CreateUser(ctx context.Context, params database.CreateUserParams) (database.User, error)
 	ResetUsers(ctx context.Context) error
 	GetUsers(ctx context.Context) ([]database.User, error)
-	CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.Rssfeed, error)
+	CreateRSSFeed(ctx context.Context, arg database.CreateRSSFeedParams) (database.CreateRSSFeedRow, error)
 	GetFeeds(ctx context.Context) ([]database.GetFeedsRow, error)
 	GetFeedByUrl(ctx context.Context, url string) (database.Rssfeed, error)
 	CreateFeedFollow(ctx context.Context, params database.CreateFeedFollowParams) (database.CreateFeedFollowRow, error)
 	GetFeedFollowsForUser(ctx context.Context, userID uuid.UUID) ([]database.GetFeedFollowsForUserRow, error)
 	UnfollowFeed(ctx context.Context, arg database.UnfollowFeedParams) error
+	MarkFeedFetched(ctx context.Context, id uuid.UUID) error
+	GetNextFeedToFetch(ctx context.Context) (database.Rssfeed, error)
+	CreatePost(ctx context.Context, arg database.CreatePostParams) (database.Post, error)
+	GetPostsForUser(ctx context.Context, arg database.GetPostsForUserParams) ([]database.GetPostsForUserRow, error)
 }
 
 // ConfigInterface defines the config operations needed by Config Interface

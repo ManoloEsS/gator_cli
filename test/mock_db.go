@@ -85,3 +85,7 @@ func (m *MockDb) CreateFeedFollow(ctx context.Context, args database.CreateFeedF
 func (m *MockDb) GetFeedFollowsForUser(ctx context.Context, userID uuid.UUID) ([]database.GetFeedFollowsForUserRow, error) {
 	return []database.GetFeedFollowsForUserRow{}, nil
 }
+
+func (m *MockDb) UnfollowFeed(ctx context.Context, arg database.UnfollowFeedParams) error {
+	return nil
+}

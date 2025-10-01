@@ -65,6 +65,7 @@ func main() {
 	cmds.Register("follow", cli.MiddlewareLoggedIn(cli.HandlerFeedFollow))
 	cmds.Register("following", cli.MiddlewareLoggedIn(cli.HandlerFeedFollowsForUser))
 	cmds.Register("unfollow", cli.MiddlewareLoggedIn(cli.HandlerUnfollowFeed))
+	cmds.Register("browse", cli.MiddlewareLoggedIn(cli.HandlerBrowse))
 
 	//run command from parsed command line arguments
 	err = cmds.Run(programState, cmd)
