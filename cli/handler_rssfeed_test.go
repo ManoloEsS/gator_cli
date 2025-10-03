@@ -2,6 +2,7 @@ package cli
 
 import (
 	"testing"
+	"time"
 )
 
 func TestStripHTML(t *testing.T) {
@@ -87,6 +88,127 @@ func TestStripHTML(t *testing.T) {
 			result := StripHTML(tt.input)
 			if result != tt.expected {
 				t.Errorf("StripHTML(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestParsePubDate(t *testing.T) {
+	tests := []struct {
+		name      string
+		input     string
+		expectOk  bool
+	}{
+		{
+			name:     "RFC1123 format",
+			input:    "Mon, 02 Jan 2006 15:04:05 MST",
+			expectOk: true,
+		},
+		{
+			name:     "RFC1123Z format",
+			input:    "Mon, 02 Jan 2006 15:04:05 -0700",
+			expectOk: true,
+		},
+		{
+			name:     "RFC822 format",
+			input:    "02 Jan 06 15:04 MST",
+			expectOk: true,
+		},
+		{
+			name:     "RFC822Z format",
+			input:    "02 Jan 06 15:04 -0700",
+			expectOk: true,
+		},
+		{
+			name:     "RFC3339 format",
+			input:    "2006-01-02T15:04:05Z",
+			expectOk: true,
+		},
+		{
+			name:     "custom format without seconds",
+			input:    "Mon, 02 Jan 2006 15:04 MST",
+			expectOk: true,
+		},
+		{
+			name:     "custom format with explicit offset",
+			input:    "Mon, 02 Jan 2006 15:04:05 -0700",
+			expectOk: true,
+		},
+		{
+			name:     "invalid date format",
+			input:    "not a date",
+			expectOk: false,
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			expectOk: false,
+		},
+		{
+			name:     "string with whitespace",
+			input:    "  Mon, 02 Jan 2006 15:04:05 MST  ",
+			expectOk: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, ok := parsePubDate(tt.input)
+			if ok != tt.expectOk {
+				t.Errorf("parsePubDate(%q) ok = %v, want %v", tt.input, ok, tt.expectOk)
+			}
+			if ok && result.IsZero() {
+				t.Errorf("parsePubDate(%q) returned zero time but ok=true", tt.input)
+			}
+		})
+	}
+}
+
+func TestNewNullTime(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		isZero   bool
+		wantNull bool
+	}{
+		{
+			name:     "valid time",
+			input:    "2006-01-02T15:04:05Z",
+			isZero:   false,
+			wantNull: false,
+		},
+		{
+			name:     "zero time",
+			input:    "",
+			isZero:   true,
+			wantNull: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var inputTime time.Time
+			if !tt.isZero {
+				parsed, err := time.Parse(time.RFC3339, tt.input)
+				if err != nil {
+					t.Fatalf("failed to parse test input time: %v", err)
+				}
+				inputTime = parsed
+			}
+
+			result := newNullTime(inputTime)
+
+			if tt.wantNull {
+				if result.Valid {
+					t.Error("expected Valid to be false for zero time")
+				}
+			} else {
+				if !result.Valid {
+					t.Error("expected Valid to be true for non-zero time")
+				}
+				if result.Time.IsZero() {
+					t.Error("expected Time to be non-zero")
+				}
 			}
 		})
 	}
